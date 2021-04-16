@@ -1,0 +1,61 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: data-collector
+  namespace: bigipreport
+spec:
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 10
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      app: frontend
+                  topologyKey: "kubernetes.io/hostname"
+          containers:
+          - name: bigipreport
+            image: bigipreport/data-collector-k8s
+            env:
+            - name: F5_SUPPORT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bigipreport-secrets
+                  key: F5_SUPPORT_USERNAME
+            - name: F5_SUPPORT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bigipreport-secrets
+                  key: F5_SUPPORT_PASSWORD
+            - name: F5_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: bigipreport-secrets
+                  key: F5_USERNAME
+            - name: F5_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bigipreport-secrets
+                  key: F5_PASSWORD
+            volumeMounts:
+              - name: bigipreport-underlay
+                mountPath: /opt/underlay
+              - name: configuration
+                mountPath: "/opt/bigipreport/config"
+          restartPolicy: Never
+          volumes:
+            - name: bigipreport-underlay
+              persistentVolumeClaim:
+                claimName: bigipreport-pvc
+            - name: configuration
+              configMap:
+                name: bigipreport-config
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            fsGroup: 472
