@@ -9,8 +9,8 @@ spec:
   schedule: "*/30 * * * *"
   jobTemplate:
     spec:
-      successfulJobsHistoryLimit: 1
-      failedJobsHistoryLimit: 10
+      successfulJobsHistoryLimit: 1 # Might not be supported depending on where you run it
+      failedJobsHistoryLimit: 10    # Might not be supported depending on where you run it
       activeDeadlineSeconds: 1800
       backoffLimit: 1
       template:
