@@ -9,6 +9,8 @@ spec:
   schedule: "*/30 * * * *"
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 1800
+      backoffLimit: 1
       template:
         spec:
           affinity:
