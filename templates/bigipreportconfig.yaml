@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bigipreport-config
+  namespace: bigipreport
+data:
+  bigipreportconfig.xml: {{- .Values.dataCollector.config | replace "BIGIPREPORT_APP_VERSION" .Chart.AppVersion | toYaml | indent 1 }}

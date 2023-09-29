@@ -16,12 +16,18 @@ spec:
       containers:
       - name: frontend
         image: bigipreport/frontend
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
         volumeMounts:
           - name: bigipreport-underlay
             mountPath: usr/share/nginx/html
             readOnly: true
         ports:
-        - containerPort: 80
+        - containerPort: {{ .Values.frontend.port }}
+        resources:
+          {{- toYaml .Values.frontend.resources | nindent 10 }}
       volumes:
         - name: bigipreport-underlay
           persistentVolumeClaim:

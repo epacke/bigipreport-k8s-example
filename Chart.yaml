@@ -1,0 +1,10 @@
+apiVersion: v2
+name: BigIPReport
+version: 1.0.0
+description: A Helm chart for deploying BigIPReport
+type: application
+home: The URL of this projects home page (optional)
+sources:
+  - https://github.com/net-utilities/BigIPReport
+  - https://github.com/epacke/bigipreport-k8s-example
+appVersion: "5.7.5"

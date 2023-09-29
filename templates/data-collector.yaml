@@ -13,6 +13,11 @@ spec:
       backoffLimit: 1
       template:
         spec:
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            fsGroup: 3000
+            allowPrivilegeEscalation: false
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -57,7 +62,3 @@ spec:
             - name: configuration
               configMap:
                 name: bigipreport-config
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 65534
-            fsGroup: 472

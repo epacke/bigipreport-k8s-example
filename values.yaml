@@ -1,12 +1,57 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: bigipreport-config
-  namespace: bigipreport
-data:
-  bigipreportconfig.xml: |
-    <!--Leave the version information intact-->
-        <Settings version="5.5.3">
+#############################
+# Frontend pod config
+#############################
+
+frontend:
+  port: 80
+  resources:
+    requests:
+      memory: "200Mi"
+      cpu: "100m"
+    limits:
+      memory: "500Mi"
+      cpu: "500m"
+
+#############################
+# Data collector pod config
+#############################
+
+# This highly depends on how many devices
+# you have and the max-jobs config
+# Below is a minimal example. If the pod
+# dies you will need to increase this
+
+dataCollector:
+  resources:
+    requests:
+      memory: "100Mi"
+      cpu: "100m"
+    limits:
+      memory: "200Mi"
+      cpu: "500m"
+
+# Recommended to create secrets in other ways
+#  credentials:
+#    F5_USERNAME: YmlnaXByZXBvcnQ=
+#    F5_PASSWORD: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+#    F5_SUPPORT_USERNAME: bXlAZW1haWwuY29t
+#    F5_SUPPORT_PASSWORD: aHR0cHM6Ly93d3cueW91dHViZS5jb20vd2F0Y2g/dj1kUXc0dzlXZ1hjUQ==
+
+  #################################################################################
+  # BigIPReport Config
+  #
+  # This is a bit different than when you run it on a server
+  # Do not specify the credentials here
+  # Ideally they should be populated using a secret in the cluster
+  #
+  # If you upgrade the report by changing image tags
+  # make sure that the configuration file does not have to be updated
+  # by checking the bigipreportconfig.ps1 for the version you want to run:
+  # https://github.com/net-utilities/BigIPReport/blob/master/bigipreport.ps1
+  #################################################################################
+  config: |
+    <!--Leave the version placeholder intact-->
+        <Settings version="BIGIPREPORT_APP_VERSION">
 
             <!--
             ***************************************************************************
