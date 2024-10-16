@@ -1,18 +1,26 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: data-collector
-  namespace: bigipreport
+  namespace: "{{ .Values.namespace }}"
 spec:
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 10
-  schedule: "*/30 * * * *"
+  schedule: "{{ .Values.dataCollector.schedule }}"
   jobTemplate:
     spec:
       activeDeadlineSeconds: 1800
       backoffLimit: 1
       template:
         spec:
+          hostname: bigipreport-data-collector
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 2000
+            seccompProfile:
+              type: RuntimeDefault
           affinity:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -22,18 +30,15 @@ spec:
                   topologyKey: "kubernetes.io/hostname"
           containers:
           - name: bigipreport
-            image: bigipreport/data-collector-k8s
+            image: "{{ .Values.dataCollector.image.repository }}:{{ .Values.dataCollector.image.tag }}"
+            resources:
+              requests:
+                memory: "600Mi"
+                cpu: "500m"
+              limits:
+                memory: "1024Mi"
+                cpu: "1"
             env:
-            - name: F5_SUPPORT_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: bigipreport-secrets
-                  key: F5_SUPPORT_USERNAME
-            - name: F5_SUPPORT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: bigipreport-secrets
-                  key: F5_SUPPORT_PASSWORD
             - name: F5_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -49,6 +54,11 @@ spec:
                 mountPath: /opt/underlay
               - name: configuration
                 mountPath: "/opt/bigipreport/config"
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
           restartPolicy: Never
           volumes:
             - name: bigipreport-underlay
@@ -57,7 +67,3 @@ spec:
             - name: configuration
               configMap:
                 name: bigipreport-config
-          securityContext:
-            runAsNonRoot: true
-            runAsUser: 65534
-            fsGroup: 472

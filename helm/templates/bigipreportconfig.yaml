@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bigipreport-config
+  namespace: "{{ .Values.namespace }}"
+data:
+  bigipreportconfig.xml: |
+    {{- .Values.bigipreportconfig | nindent 4 }}
